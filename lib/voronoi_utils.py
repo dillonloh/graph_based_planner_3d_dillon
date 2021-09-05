@@ -71,7 +71,7 @@ def create_grid_and_edges(data,e1,e2):
 
 def create_waypoints_edges(data,start,number_list,e1,e2,waypoints_straight):
     '''
-    Create a straight egdes between waypoints
+    Create a straight edges between waypoints
     '''
     # Initialize an empty lists
     grid = ()
@@ -152,6 +152,7 @@ def create_graph(edges, start, goal, data, data1, data2):
 
 
 def heuristic(n1, n2):
+    ''' returns the euclidean norm between n1 and n2 '''
     return ( (n1[0]-n2[0])**2 +(n1[1]-n2[1])**2 +(n1[2]-n2[2])**2 )**0.5
 
 def area_triangle(a, b, c):
@@ -209,7 +210,7 @@ def a_star_graph(graph, start, goal, h):
     else:
         print('**********************')
         print('Failed to find a path!')
-        print('**********************') 
+        print('**********************')
     return path[::-1], path_cost
 
 
@@ -261,5 +262,5 @@ def a_star_graph_WP(graph, start, number_list, h):
     else:
         print('**********************')
         print('Failed to find a path_WP!')
-        print('**********************') 
+        print('**********************')
     return path[::-1], path_cost

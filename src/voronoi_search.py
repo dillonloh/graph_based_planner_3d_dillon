@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-    import numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib._png import read_png
@@ -24,16 +24,19 @@ def plotGridEdges(grid, edges):
     plt.show()
 
 def plotVoronoiPath(grid, edges, path, start, goal, start_graph, goal_graph):
-    fig = plt.figure()  
-    ax = fig.add_subplot(111, projection='3d') 
-    map = mpimg.imread('./images/NIC6F.png')
-    ax.set_xlim(0, map.shape[0])
-    ax.set_ylim(0, map.shape[1]) 
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    map1 = mpimg.imread('./images/chinokyoten1f.png')
+    map2 = mpimg.imread('./images/chinokyoten2f.png')
+    map3 = mpimg.imread('./images/chinokyoten3f.png')
+
+    ax.set_xlim(0, map1.shape[0])
+    ax.set_ylim(0, map1.shape[1])
     ax.set_zlim(0, 20)
-    x, y = np.ogrid[0:map.shape[0], 0:map.shape[1]]
-    ax.plot_surface(x, y, np.atleast_2d(0), rstride=10, cstride=10,facecolors=map, shade=False)
-    ax.plot_surface(x, y, np.atleast_2d(10), rstride=10, cstride=10,facecolors=map, shade=False)
-    ax.plot_surface(x, y, np.atleast_2d(20), rstride=10, cstride=10,facecolors=map, shade=False)
+    x, y = np.ogrid[0:map1.shape[0], 0:map1.shape[1]] # Creates two arrays of coordinates for a meshgrid https://numpy.org/doc/stable/reference/generated/numpy.ogrid.html
+    ax.plot_surface(x, y, np.atleast_2d(0), rstride=10, cstride=10, shade=False) # np.atleast_2d makes its input into at least a 2d array e.g. 0 -> [[0]]
+    ax.plot_surface(x, y, np.atleast_2d(10), rstride=10, cstride=10, shade=False)
+    ax.plot_surface(x, y, np.atleast_2d(20), rstride=10, cstride=10, shade=False)
 
     for e in edges:
         p1 = e[0]
@@ -42,7 +45,7 @@ def plotVoronoiPath(grid, edges, path, start, goal, start_graph, goal_graph):
         #plt.plot([p1[2], p2[2]], [p1[1], p2[1]], [p1[0], p2[0]], 'b-')
 
     plt.plot([start[2], start_graph[2]], [start[1], start_graph[1]], [start[0], start_graph[0]], 'r-')
-    
+
     if (waypoints != 1):
         for i in range(len(path)-1):
             p1 = path[i]
@@ -88,7 +91,7 @@ if __name__ == "__main__":
     rows2 = [ line.strip().split(' ') for line in filename2.split('\n') ]
 
     #NIC6F_elevator
-    e1 = (0,947,567) 
+    e1 = (0,947,567)
     e2 = (20,947,567)
 
     #NIC6F
@@ -96,13 +99,13 @@ if __name__ == "__main__":
     goal = (20,900, 735)
 
     #NIC6F_waypoints
-    waypoints = 1
-    waypoints_straight = 1
+    waypoints = 0
+    waypoints_straight = 0
 
     w_start = start
-    w1 = (0,740,645) 
+    w1 = (0,740,645)
     w2 = (0,870,540)
-    w3 = (20,900,570) 
+    w3 = (20,900,570)
     w4 = (20,925,620)
     w_final = goal
     number_list = [w_start, w1, w2, w3, w4, w_final]
@@ -132,8 +135,10 @@ if __name__ == "__main__":
             path_WP.extend(path)
         if (waypoints_straight == 1):
             plotVoronoiPath(grid, waypoints_edges, path_WP, start, goal, start_graph, goal_graph)
+
         elif (waypoints_straight != 1):
             plotVoronoiPath(grid, edges, path_WP, start, goal, start_graph, goal_graph)
+
 
     elif (waypoints != 1):
         path, cost = a_star_graph(graph, start_graph, goal_graph, heuristic)
