@@ -9,9 +9,9 @@ from math import pi, atan, sin, cos
 from scipy.ndimage import rotate, shift
 
 
-map1 = mpimg.imread('./images/chinokyoten1f.png')
-map2 = mpimg.imread('./images/chinokyoten2f.png')
-map3 = mpimg.imread('./images/chinokyoten3f.png')
+map1 = mpimg.imread('./images/chinokyoten1f_fixed.png')
+map2 = mpimg.imread('./images/chinokyoten2f_fixed.png')
+map3 = mpimg.imread('./images/chinokyoten3f_fixed.png')
 
 
 fig = plt.figure()
@@ -20,9 +20,9 @@ ax = fig.add_subplot(111, projection='3d')
 
 # translation and rotation of 1F
 
-x, y = np.ogrid[0:map1.shape[0], 0:map1.shape[1]]
+x, y = np.mgrid[0:map1.shape[0], 0:map1.shape[1]]
 z = np.atleast_2d(0)
-p1_1, p1_2 = (2837, 1714), (2764, 1623)
+p1_1, p1_2 = (2841, 2284), (2783, 2387)
 newp1_2 = ((p1_2[0]-p1_1[0]), (p1_2[1] - p1_1[1]))
 rot1 = -atan(newp1_2[1]/newp1_2[0])
 
@@ -40,7 +40,7 @@ ax.plot_surface(xtr, ytr, z, facecolors=map1, shade=False, rstride=5, cstride=5)
 
 x, y = np.mgrid[0:map2.shape[0], 0:map2.shape[1]]
 z = np.atleast_2d(10)
-p2_1, p2_2 = (2063, 2786), (2121, 2735)
+p2_1, p2_2 = (2063, 1211), (2123, 1264)
 newp2_2 = ((p2_2[0]-p2_1[0]), (p2_2[1] - p2_1[1]))
 rot2 = -atan(newp2_2[1]/newp2_2[0])
 
@@ -58,10 +58,10 @@ ax.plot_surface(xtr, ytr, z, facecolors=map2, shade=False, rstride=5, cstride=5)
 
 x, y = np.mgrid[0:map3.shape[0], 0:map3.shape[1]]
 z = np.atleast_2d(20)
-p3_1, p3_2 = (694, 2538), (726, 2610)
+p3_1, p3_2 = (693, 1462), (727, 1388)
 newp3_2 = ((p3_2[0]-p3_1[0]), (p3_2[1] - p3_1[1]))
 rot3 = -atan(newp3_2[1]/newp3_2[0])
-print(rot3)
+
 
 xt = x - p3_1[0]
 yt = y - p3_1[1]
