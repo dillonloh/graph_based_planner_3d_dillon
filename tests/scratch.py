@@ -9,6 +9,12 @@ from math import pi, atan, sin, cos
 from scipy.ndimage import rotate, shift
 
 
+# Initialisation Parameters
+
+USERINPUT = False # if True, allow user to manually set point1 and point2 coordinates
+
+
+
 map1 = mpimg.imread('./images/chinokyoten1f_fixed.png')
 map2 = mpimg.imread('./images/chinokyoten2f_fixed.png')
 map3 = mpimg.imread('./images/chinokyoten3f_fixed.png')
@@ -16,18 +22,21 @@ map3 = mpimg.imread('./images/chinokyoten3f_fixed.png')
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-# ax.plot([0, 0, 0], [0, 0, 10], [0, 0, 20], )
+ax.plot([0, 0, 0], [0, 0, 10], [0, 0, 20], )
 
 # translation and rotation of 1F
 
 x, y = np.mgrid[0:map1.shape[0], 0:map1.shape[1]]
 z = np.atleast_2d(0)
 
-# prompt for user input on coordinates of Point 1 and Point 2
-p1_1 = eval(input('Please enter Floor 1\'s Point 1 Coordinate in (x, y) form: '))
-p1_2 = eval(input('Please enter Floor 1\'s Point 2 Coordinate in (x, y) form: '))
+if USERINPUT == True:
+    # prompt for user input on coordinates of Point 1 and Point 2
+    p1_1 = eval(input('Please enter Floor 1\'s Point 1 Coordinate in (x, y) form: '))
+    p1_2 = eval(input('Please enter Floor 1\'s Point 2 Coordinate in (x, y) form: '))
 
-# p1_1, p1_2 = (2841, 2284), (2783, 2387)
+else:
+    p1_1, p1_2 = (2841, 2284), (2783, 2387)
+
 newp1_2 = ((p1_2[0]-p1_1[0]), (p1_2[1] - p1_1[1]))
 rot1 = -atan(newp1_2[1]/newp1_2[0])
 
@@ -45,9 +54,14 @@ ax.plot_surface(xtr, ytr, z, facecolors=map1, shade=False, rstride=20, cstride=2
 
 x, y = np.mgrid[0:map2.shape[0], 0:map2.shape[1]]
 z = np.atleast_2d(10)
-p2_1 = eval(input('Please enter Floor 2\'s Point 1 Coordinate in (x, y) form: '))
-p2_2 = eval(input('Please enter Floor 2\'s Point 2 Coordinate in (x, y) form: '))
-# p2_1, p2_2 = (2063, 1211), (2123, 1264)
+
+if USERINPUT == True:
+    p2_1 = eval(input('Please enter Floor 2\'s Point 1 Coordinate in (x, y) form: '))
+    p2_2 = eval(input('Please enter Floor 2\'s Point 2 Coordinate in (x, y) form: '))
+
+else:
+    p2_1, p2_2 = (2063, 1211), (2123, 1264)
+
 newp2_2 = ((p2_2[0]-p2_1[0]), (p2_2[1] - p2_1[1]))
 rot2 = -atan(newp2_2[1]/newp2_2[0])
 
@@ -65,9 +79,13 @@ ax.plot_surface(xtr, ytr, z, facecolors=map2, shade=False, rstride=20, cstride=2
 
 x, y = np.mgrid[0:map3.shape[0], 0:map3.shape[1]]
 z = np.atleast_2d(20)
-p3_1 = eval(input('Please enter Floor 3\'s Point 1 Coordinate in (x, y) form: '))
-p3_2 = eval(input('Please enter Floor 3\'s Point 2 Coordinate in (x, y) form: '))
-# p3_1, p3_2 = (693, 1462), (727, 1388)
+
+if USERINPUT == True:
+    p3_1 = eval(input('Please enter Floor 3\'s Point 1 Coordinate in (x, y) form: '))
+    p3_2 = eval(input('Please enter Floor 3\'s Point 2 Coordinate in (x, y) form: '))
+
+else:
+    p3_1, p3_2 = (693, 1462), (727, 1388)
 newp3_2 = ((p3_2[0]-p3_1[0]), (p3_2[1] - p3_1[1]))
 rot3 = -atan(newp3_2[1]/newp3_2[0])
 
