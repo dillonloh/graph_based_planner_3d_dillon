@@ -1,22 +1,35 @@
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
-
+from skimage import color, filters, exposure, morphology
+import skimage
 
 FLANN = False # if True, uses FLANN to match, else uses Brute Force
 LOWES_CONSTANT = 0.7
 
 MIN_MATCH_COUNT = 30
 
-img1 = cv2.imread('./images/chinokyoten2f_fixed.png',0)          # queryImage
-img2 = cv2.imread('./images/chinokyoten3f_fixed.png',0) # trainImage
-img3 = cv2.imread('./images/chinokyoten1f_fixed.png',0)
+img1 = cv2.imread('./images/chinokyoten2f_marked.png', -1)          # queryImage
+img2 = cv2.imread('./images/chinokyoten3f_marked.png', -1) # trainImage
+img3 = cv2.imread('./images/chinokyoten1f_marked.png', -1)
+
+img1 = skimage.color.rgb2gray(img1)
+img2 = skimage.color.rgb2gray(img2)
+
+# thresh = filters.threshold_otsu(img1)
+# img1 = img1 > thresh
+
+# thresh = filters.threshold_otsu(img2)
+# img2 = img2 > thresh
+
+img1 = img1.astype('uint8')
+img2 = img2.astype('uint8')
 
 # Initiate SIFT detector
 sift = cv2.xfeatures2d.SIFT_create()
 
 # find the keypoints and descriptors with SIFT
-kp1, des1 = sift.detectAndCompute(img1,None)
+kp1, des1 = sift.detectAndCompute(img1,None)    
 kp2, des2 = sift.detectAndCompute(img2,None)
 
 
@@ -61,7 +74,7 @@ if FLANN == True:
 
     imgoutput = cv2.drawMatches(img1,kp1,img2,kp2,good,None,**draw_params)
 
-    plt.imshow(imgoutput, 'gray'), plt.show()
+    plt.imshow(imgoutput), plt.show()
 
     matches = flann.knnMatch(des1,des2,k=2)
 

@@ -10,7 +10,7 @@ from scipy.ndimage import rotate, shift
 
 # Initialisation Parameters
 
-USERINPUT = True # if True, allow user to manually set point1 and point2 coordinates
+USERINPUT = False # if True, allow user to manually set point1 and point2 coordinates
 
 
 map1 = mpimg.imread('./images/chinokyoten1f_fixed.png')
