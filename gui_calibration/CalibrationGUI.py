@@ -52,7 +52,7 @@ def create_window():
 
         with open('gui_calibration\shared.pkl', 'wb') as fp:
             pickle.dump(shared, fp)
-
+    
         run(['python', "gui_calibration\mapcalibration.py"])
 
 
@@ -123,8 +123,8 @@ def create_window():
         global GLOBAL_POINTS
 
         canvas = event.widget
-        x = canvas.canvasx(event.x)
-        y = canvas.canvasy(event.y)
+        y = canvas.canvasx(event.x)
+        x = canvas.canvasy(event.y)
 
         print('[FLOOR {}] Coordinates of point {} is ({},{})'.format(CURRENT_IMG_INDEX+1, SET_NO, x, y))
 
