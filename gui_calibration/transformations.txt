@@ -10,7 +10,7 @@ Translation Matrix of Floor 2
 [[-2061.]
  [-1211.]
  [    0.]]
-Rotation Matrix of Floor 1
+Rotation Matrix of Floor 2
 [[ 0.15491599 -0.98792765  0.        ]
  [ 0.98792765  0.15491599  0.        ]
  [ 0.          0.          1.        ]]
@@ -18,7 +18,7 @@ Translation Matrix of Floor 3
 [[ -696.]
  [-1460.]
  [    0.]]
-Rotation Matrix of Floor 1
-[[-0.99044803  0.13788656  0.        ]
- [-0.13788656 -0.99044803  0.        ]
+Rotation Matrix of Floor 3
+[[-0.99272104 -0.12043642  0.        ]
+ [ 0.12043642 -0.99272104  0.        ]
  [ 0.          0.          1.        ]]

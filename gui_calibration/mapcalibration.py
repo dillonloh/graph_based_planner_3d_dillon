@@ -247,13 +247,13 @@ elif CALIBRATION_METHOD == 'MIN_SQUARES':
         pickle.dump(transforms_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     with open('transformations.txt', 'w') as f:
-        lines = ['Translation Matrix of Floor 1', str(trans_matrices[0]),
-                 'Rotation Matrix of Floor 1', str(rot_matrices[0]),
-                 'Translation Matrix of Floor 2', str(trans_matrices[1]),
-                 'Rotation Matrix of Floor 1', str(rot_matrices[1]), 
-                 'Translation Matrix of Floor 3', str(trans_matrices[2]),
-                 'Rotation Matrix of Floor 1', str(rot_matrices[2]),
-                 ]
+        lines = []
+        for i, j in zip(range(len(trans_matrices)),range(len(rot_matrices))):
+            lines.append('Translation Matrix of Floor {}'.format(i+1))
+            lines.append(str(trans_matrices[i]))
+            lines.append('Rotation Matrix of Floor {}'.format(j+1))
+            lines.append(str(rot_matrices[j]))
+
                 
         f.write('\n'.join(lines))
 
