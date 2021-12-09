@@ -50,10 +50,10 @@ def create_window():
 
         shared = GLOBAL_POINTS
 
-        with open('gui_calibration\shared.pkl', 'wb') as fp:
+        with open('shared.pkl', 'wb') as fp:
             pickle.dump(shared, fp)
     
-        run(['python', "gui_calibration\mapcalibration.py"])
+        run(['python', "mapcalibration.py"])
 
 
     end_label = Label(master=frame_btn, text='Click here when done:')
@@ -108,7 +108,7 @@ def create_window():
     
     for i in range(NO_FLOORS):
 
-        File = askopenfilename(parent=window, initialdir="C:/",title='Please upload the map image of Floor {}.'.format(i+1))
+        File = askopenfilename(parent=window, initialdir="../images",title='Please upload the map image of Floor {}.'.format(i+1))
         GLOBAL_IMAGE_PATHS.append(File)
         GLOBAL_IMAGES.append(ImageTk.PhotoImage(Image.open(File)))
     

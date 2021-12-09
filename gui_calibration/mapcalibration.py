@@ -17,7 +17,7 @@ CALIBRATION_METHOD = 'MIN_SQUARES'
 
 print('Nice')
 
-with open('gui_calibration\shared.pkl', 'rb') as fp:
+with open('shared.pkl', 'rb') as fp:
     shared = pickle.load(fp)
 
 
@@ -79,6 +79,7 @@ def rotation(angle, x, y):
 
 translated_floor_points = floor_points
 translation_amounts = []
+trans_matrices = []
 
 for f in translated_floor_points:
     translation_x = f[0][0]
@@ -88,6 +89,19 @@ for f in translated_floor_points:
         point[0] -= translation_x
         point[1] -= translation_y
 
+    # translation matrix for each floor
+    # how to get matrix: https://en.wikipedia.org/wiki/Translation_(geometry)
+    # trans_matrices.append(np.array(([[1, 0, 0, -translation_x],
+    #                                 [0, 1, 0, -translation_y],
+    #                                 [0, 0, 1, 0],
+    #                                 [0, 0 ,0, 1]])))
+    trans_matrices.append(np.array(([[-translation_x],
+                                     [-translation_y],
+                                     [0]])))
+
+for i in range(len(trans_matrices)):
+    print('Translation Matrix for Floor {}'.format(i+1))
+    print(trans_matrices[i])
 
 ###### FINDING ANGLES BETWEEN CORRESPONDING POINTS #####
 
@@ -145,7 +159,6 @@ elif CALIBRATION_METHOD == 'MIN_SQUARES':
     rot_angles = np.linspace(0,2*pi, NO_OF_ANGLES)
 
 
-
     # generating all rotated points for each angle for all floor
     all_rotated_points = []
 
@@ -185,13 +198,23 @@ elif CALIBRATION_METHOD == 'MIN_SQUARES':
 
 
 
-
     # fitting model and getting rotation angle for each floor
 
     rotation_angles = [0] # initialise with 0 cause first floor wont rotate
-    
+    # rot_matrices = [np.array(([[1, 0, 0, 0],
+    #                            [0, 1, 0, 0],
+    #                            [0, 0, 1, 0],
+    #                            [0, 0, 0, 1]]))]
+
+    rot_matrices = [np.array(([[1, 0, 0],
+                               [0, 1, 0],
+                               [0, 0, 1]]))]
+
+
     def objective(theta, a, phi):
         return np.sqrt((2*a**2)*(1-np.cos(theta+phi)))
+
+
 
     for floor in all_distances:
 
@@ -206,22 +229,48 @@ elif CALIBRATION_METHOD == 'MIN_SQUARES':
         min = fmin(fitted_model, 0) # this is our rotation angle
         rotation_angles.append(min)
 
+        # rotation matrices
+        # how to get rotation matrices: https://download.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
+        rot_matrices.append(np.array(([[cos(min), -sin(min), 0],
+                                       [sin(min), cos(min), 0],
+                                       [0, 0, 1]])))
+
+    for i in range(len(rot_matrices)):
+        print('Rotation matrix for Floor {}'.format(i+1))
+        print(rot_matrices[i])
+
+    transforms_dict = {}
+    transforms_dict['translation'] = trans_matrices
+    transforms_dict['rotations'] = rot_matrices
+
+    with open('transformations.pickle', 'wb') as handle:
+        pickle.dump(transforms_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    with open('transformations.txt', 'w') as f:
+        lines = ['Translation Matrix of Floor 1', str(trans_matrices[0]),
+                 'Rotation Matrix of Floor 1', str(rot_matrices[0]),
+                 'Translation Matrix of Floor 2', str(trans_matrices[1]),
+                 'Rotation Matrix of Floor 1', str(rot_matrices[1]), 
+                 'Translation Matrix of Floor 3', str(trans_matrices[2]),
+                 'Rotation Matrix of Floor 1', str(rot_matrices[2]),
+                 ]
+                
+        f.write('\n'.join(lines))
+
+        
     # plotting
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    for i in range(2):
+    for i in range(NO_FLOORS): # set 2 for faster load
         x, y = np.mgrid[0:MAP_IMAGES[i].shape[0], 0:MAP_IMAGES[i].shape[1]]
         z = np.atleast_2d(i*10)
         
+
         xt, yt = translation(-translation_amounts[i][0], -translation_amounts[i][1], x, y)
         xtr, ytr = rotation(rotation_angles[i], xt, yt)
         ax.plot_surface(xtr, ytr, z, facecolors=MAP_IMAGES[i], shade=False, rstride=20, cstride=20)
 
     plt.show()
-
-
-
-
 
