@@ -5,7 +5,7 @@ import matplotlib.image as mpimg
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.transforms as mtransforms
-from math import pi, atan, sin, cos, acos, sqrt
+from math import gamma, pi, atan, sin, cos, acos, sqrt
 from scipy.ndimage import rotate, shift
 import pickle
 from sklearn import linear_model
@@ -249,6 +249,9 @@ elif CALIBRATION_METHOD == 'MIN_SQUARES':
     with open('transformations.txt', 'w') as f:
         lines = []
         for i, j in zip(range(len(trans_matrices)),range(len(rot_matrices))):
+            lines.append('Angle of rot. about x-axis (Floor {}): {}'.format(i+1, 0))
+            lines.append('Angle of rot. about y-axis (Floor {}): {}'.format(i+1, 0))
+            lines.append('Angle of rot. about z-axis (Floor {}): {}'.format(i+1, rotation_angles[i]))
             lines.append('Translation Matrix of Floor {}'.format(i+1))
             lines.append(str(trans_matrices[i]))
             lines.append('Rotation Matrix of Floor {}'.format(j+1))

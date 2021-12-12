@@ -1,3 +1,6 @@
+Angle of rot. about x-axis (Floor 1): 0
+Angle of rot. about y-axis (Floor 1): 0
+Angle of rot. about z-axis (Floor 1): 0
 Translation Matrix of Floor 1
 [[-2834.]
  [-2285.]
@@ -6,6 +9,9 @@ Rotation Matrix of Floor 1
 [[1 0 0]
  [0 1 0]
  [0 0 1]]
+Angle of rot. about x-axis (Floor 2): 0
+Angle of rot. about y-axis (Floor 2): 0
+Angle of rot. about z-axis (Floor 2): [1.41525391]
 Translation Matrix of Floor 2
 [[-2061.]
  [-1211.]
@@ -14,6 +20,9 @@ Rotation Matrix of Floor 2
 [[ 0.15491599 -0.98792765  0.        ]
  [ 0.98792765  0.15491599  0.        ]
  [ 0.          0.          1.        ]]
+Angle of rot. about x-axis (Floor 3): 0
+Angle of rot. about y-axis (Floor 3): 0
+Angle of rot. about z-axis (Floor 3): [3.02086316]
 Translation Matrix of Floor 3
 [[ -696.]
  [-1460.]
