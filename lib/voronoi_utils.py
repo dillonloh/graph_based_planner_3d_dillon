@@ -151,6 +151,7 @@ def create_graph(edges, start, goal, data, data1, data2):
     return graph
 
 
+
 def heuristic(n1, n2):
     ''' returns the euclidean norm between n1 and n2 '''
     return ( (n1[0]-n2[0])**2 +(n1[1]-n2[1])**2 +(n1[2]-n2[2])**2 )**0.5
@@ -264,3 +265,24 @@ def a_star_graph_WP(graph, start, number_list, h):
         print('Failed to find a path_WP!')
         print('**********************')
     return path[::-1], path_cost
+
+
+### Saving graph as pickle file ###
+
+def save_pickle_graph(graph, filename):
+    '''pickle a file using the name given'''
+
+    if not isinstance(filename, str):
+        raise TypeError('Your provided file name is not of type str')
+
+    nx.write_gpickle(graph, filename)
+
+
+def load_pickle_graph(filename):
+    '''unpickle a file with the name given'''
+
+    if not isinstance(filename, str):
+        raise TypeError('Your provided file name is not of type str')
+
+    G = nx.read_gpickle(filename)
+    return G

@@ -53,7 +53,7 @@ def create_window():
         with open('shared.pkl', 'wb') as fp:
             pickle.dump(shared, fp)
     
-        run(['python', "mapcalibration.py"])
+        run(['python', "mapcalibration2.py"])
 
 
     end_label = Label(master=frame_btn, text='Click here when done:')

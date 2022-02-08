@@ -12,7 +12,9 @@ from os import path
 import sys
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-from lib.voronoi_utils import a_star_graph, a_star_graph_WP, closest_node, create_grid_and_edges, create_waypoints_edges, create_graph, heuristic
+from lib.voronoi_utils import a_star_graph, a_star_graph_WP, closest_node, create_grid_and_edges, create_waypoints_edges, create_graph, heuristic, load_pickle_graph, save_pickle_graph
+
+PICKLE = False
 
 def plotGridEdges(grid, edges):
     plt.imshow(grid, origin='lower', cmap='Greys')
@@ -110,12 +112,30 @@ if __name__ == "__main__":
     w_final = goal
     number_list = [w_start, w1, w2, w3, w4, w_final]
 
+
     if (waypoints == 1 and waypoints_straight == 1):
         grid, waypoints_edges = create_waypoints_edges(data,start,number_list,e1,e2,waypoints_straight)
-        graph = create_graph(waypoints_edges, start, goal, data, data1, data2)
+        if not path.exists('graph.gpickle'):
+            graph = create_graph(waypoints_edges, start, goal, data, data1, data2)
+            save_pickle_graph(graph, 'graph.gpickle')
+            print('Saving new graph.gpickle file')
+        else:
+            graph = load_pickle_graph('graph.gpickle')
+            print('Loading from existing graph.gpickle file')
+
     elif (waypoints != 1 or waypoints_straight != 1):
         grid, edges = create_grid_and_edges(data,e1,e2)
-        graph = create_graph(edges, start, goal, data, data1, data2)
+        if not path.exists('graph.gpickle'):
+            graph = create_graph(edges, start, goal, data, data1, data2)
+            save_pickle_graph(graph, 'graph.gpickle')
+            print('Saving new graph.gpickle file')
+        else:
+            graph = load_pickle_graph('graph.gpickle')
+            print('Loading from existing graph.gpickle file')
+
+    t1 = time.perf_counter()
+    total = t1-t0
+    print('Compu. time =', total)
 
     start_graph = closest_node(graph, start)
     goal_graph = closest_node(graph, goal)
@@ -144,9 +164,7 @@ if __name__ == "__main__":
         path, cost = a_star_graph(graph, start_graph, goal_graph, heuristic)
         plotVoronoiPath(grid, edges, path, start, goal, start_graph, goal_graph)
 
-    t1 = time.perf_counter()
-    total = t1-t0
-    print('Compu. time =', total)
+
     # number_list[-1] = goal
     # number_list[-2] = (20,925,620)
     # number_list[-3] = (20,900,570)
