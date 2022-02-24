@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
+from typing import Type
 from bresenham import bresenham
 from scipy.spatial import Voronoi
 import numpy as np
 from queue import PriorityQueue
 import networkx as nx
 from PIL import Image, ImageDraw
-
+from os import path
 
 def closest_node(graph, current_position):
     '''
@@ -267,7 +268,7 @@ def a_star_graph_WP(graph, start, number_list, h):
     return path[::-1], path_cost
 
 
-### Saving graph as pickle file ###
+### Editing pickled graph file ###
 
 def save_pickle_graph(graph, filename):
     '''pickle a file using the name given'''
@@ -286,3 +287,60 @@ def load_pickle_graph(filename):
 
     G = nx.read_gpickle(filename)
     return G
+
+
+def add_pickle_graph(filename, new_nodes, new_filename, replace_old=False, join='END'):
+    '''add data to a pickled graph file'''
+
+    if not path.exists(filename):
+        raise FileNotFoundError('File does not exist: %s' % filename)
+
+    file = load_pickle_graph(filename)
+    print('%s loaded.' % filename)
+
+    if not isinstance(file, list):
+        raise TypeError('unpickled data is not list of nodes')
+
+    if join == 'START':
+        file.insert(0, new_nodes)
+    elif join == 'END':
+        file.insert(len(file), new_nodes)
+        
+    if replace_old==True:
+            save_pickle_graph(file, filename)
+    else:
+            save_pickle_graph(file, new_filename)
+  
+    return None
+
+
+def delete_pickle_graph_by_floor(filename, floor_no, new_filename, replace_old=False):
+    '''remove data of a floor from pickled graph file'''
+
+    if not path.exists(filename):
+        raise FileNotFoundError('File does not exist: %s' % filename)
+
+    file = load_pickle_graph(filename)
+    print('%s loaded.' % filename)
+
+    if not isinstance(file, list):
+        raise TypeError('unpickled data is not list of nodes')
+
+    if not isinstance(floor_no, int):
+        raise TypeError('floor number must be int')
+
+    new_node_list = []
+    
+    for i in range(len(file)):
+        value = file[i][0]
+        converted_value = getattr(value, "tolist", lambda: value)()
+        if converted_value != float(floor_no*10):
+            new_node_list.append(file[i])
+        
+    if replace_old==True:
+            save_pickle_graph(new_node_list, filename)
+    else:
+            save_pickle_graph(new_node_list, new_filename)
+
+    return None
+

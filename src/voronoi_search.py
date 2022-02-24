@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from xxlimited import new
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -12,7 +13,7 @@ from os import path
 import sys
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-from lib.voronoi_utils import a_star_graph, a_star_graph_WP, closest_node, create_grid_and_edges, create_waypoints_edges, create_graph, heuristic, load_pickle_graph, save_pickle_graph
+from lib.voronoi_utils import a_star_graph, a_star_graph_WP, closest_node, create_grid_and_edges, create_waypoints_edges, create_graph, delete_pickle_graph_by_floor, heuristic, load_pickle_graph, save_pickle_graph, add_pickle_graph
 
 PICKLE = False
 
@@ -44,7 +45,7 @@ def plotVoronoiPath(grid, edges, path, start, goal, start_graph, goal_graph):
         p1 = e[0]
         p2 = e[1]
         #voronoi_edges is not necessary to be shown
-        #plt.plot([p1[2], p2[2]], [p1[1], p2[1]], [p1[0], p2[0]], 'b-')
+        plt.plot([p1[2], p2[2]], [p1[1], p2[1]], [p1[0], p2[0]], 'b-')
 
     plt.plot([start[2], start_graph[2]], [start[1], start_graph[1]], [start[0], start_graph[0]], 'r-')
 
@@ -112,7 +113,8 @@ if __name__ == "__main__":
     w_final = goal
     number_list = [w_start, w1, w2, w3, w4, w_final]
 
-
+### EDITED CODE FOR PICKLE ###
+                                    
     if (waypoints == 1 and waypoints_straight == 1):
         grid, waypoints_edges = create_waypoints_edges(data,start,number_list,e1,e2,waypoints_straight)
         if not path.exists('graph.gpickle'):
@@ -133,17 +135,17 @@ if __name__ == "__main__":
             graph = load_pickle_graph('graph.gpickle')
             print('Loading from existing graph.gpickle file')
 
-    t1 = time.perf_counter()
-    total = t1-t0
-    print('Compu. time =', total)
+
+### END EDITED CODE FOR PICKLE ###
+
 
     start_graph = closest_node(graph, start)
-    goal_graph = closest_node(graph, goal)
+    goal_graph = closest_node(graph, goal)                                                                                          
     w1_graph = closest_node(graph, w1)
     w2_graph = closest_node(graph, w2)
     w3_graph = closest_node(graph, w3)
     w4_graph = closest_node(graph, w4)
-    w_final_graph = closest_node(graph, w_final)
+    w_final_graph = closest_node(graph, w_final)                                                                 
 
 
     if (waypoints == 1):
@@ -162,12 +164,39 @@ if __name__ == "__main__":
 
     elif (waypoints != 1):
         path, cost = a_star_graph(graph, start_graph, goal_graph, heuristic)
-        plotVoronoiPath(grid, edges, path, start, goal, start_graph, goal_graph)
 
+        # Testing add and delete nodes
+        save_pickle_graph(path, 'path_1')
+        print('Original path nodes')
+        path1 = load_pickle_graph('path_1')
+        print(path1)
+        print('')
+        delete_pickle_graph_by_floor('path_1', 0, new_filename='path_1_no_0', replace_old=False)
+        print('Path nodes after deleting floor 1 nodes')
+        path2 = load_pickle_graph('path_1_no_0')
+        print(path2)
+        print('')
+        delete_pickle_graph_by_floor('path_1', 2, new_filename='path_1_no_3', replace_old=False)
+        print('Path nodes after deleting floor 3 nodes')
+        path3 = load_pickle_graph('path_1_no_3')
+        print(path3)
+        add_pickle_graph('path_1_no_3', path2, 'path_combined', replace_old=False)
+        print('')
+        print('Added F3 nodes to F1 nodes')
+        pathcom = load_pickle_graph('path_combined')
+        print(pathcom)
+
+        # End test
+
+        #plotVoronoiPath(grid, edges, path, start, goal, start_graph, goal_graph)
+
+    t1 = time.perf_counter()
+    total = t1-t0
+    print('Compu. time =', total)
 
     # number_list[-1] = goal
     # number_list[-2] = (20,925,620)
     # number_list[-3] = (20,900,570)
     # number_list[-4] = (0,870,540)
-    # number_list[-5] = (0,740,645)
+    # number_list[-5] = (0,740,645)                                      
     # number_list[ 0] = start
