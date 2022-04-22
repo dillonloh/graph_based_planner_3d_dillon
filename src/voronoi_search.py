@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from xxlimited import new
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -163,30 +162,61 @@ if __name__ == "__main__":
 
 
     elif (waypoints != 1):
-        path, cost = a_star_graph(graph, start_graph, goal_graph, heuristic)
+        path, cost, path_graph = a_star_graph(graph, start_graph, goal_graph, heuristic)
+        print('Full graph of all floors')
+        print('')
+        print(path_graph)
+        print('')
+        print(path_graph.edges)
 
-        # Testing add and delete nodes
-        save_pickle_graph(path, 'path_1')
-        print('Original path nodes')
-        path1 = load_pickle_graph('path_1')
-        print(path1)
-        print('')
-        delete_pickle_graph_by_floor('path_1', 0, new_filename='path_1_no_0', replace_old=False)
-        print('Path nodes after deleting floor 1 nodes')
-        path2 = load_pickle_graph('path_1_no_0')
-        print(path2)
-        print('')
-        delete_pickle_graph_by_floor('path_1', 2, new_filename='path_1_no_3', replace_old=False)
-        print('Path nodes after deleting floor 3 nodes')
-        path3 = load_pickle_graph('path_1_no_3')
-        print(path3)
-        add_pickle_graph('path_1_no_3', path2, 'path_combined', replace_old=False)
-        print('')
-        print('Added F3 nodes to F1 nodes')
-        pathcom = load_pickle_graph('path_combined')
-        print(pathcom)
 
-        # End test
+        # Use networkx subgraph_view method to filter graph data
+
+        def filter_f0(n1, floor=0):
+            return n1[0] == floor
+
+        def filter_f2(n1, floor=20):
+            return n1[0] == floor              
+
+        subpathf0 = nx.subgraph_view(path_graph, filter_node=filter_f0).copy()
+        print('')
+        print('Only Floor 0 graph')
+        print('')
+        print(subpathf0)
+        print('')
+        print(subpathf0.edges)
+
+        subpathf2 = nx.subgraph_view(path_graph, filter_node=filter_f2).copy()
+        print(subpathf2.edges)
+
+        added_graph = subpathf0.add_edges_from(subpathf2.edges)
+        print(added_graph)
+        
+
+
+    ############################################ 
+        # # Testing add and delete nodes
+        # save_pickle_graph(path, 'path_1')
+        # print('Original path nodes')
+        # path1 = load_pickle_graph('path_1')
+        # print(path1)
+        # print('')
+        # delete_pickle_graph_by_floor('path_1', 0, new_filename='path_1_no_0', replace_old=False)
+        # print('Path nodes after deleting floor 1 nodes')
+        # path2 = load_pickle_graph('path_1_no_0')
+        # print(path2)
+        # print('')
+        # delete_pickle_graph_by_floor('path_1', 2, new_filename='path_1_no_3', replace_old=False)
+        # print('Path nodes after deleting floor 3 nodes')
+        # path3 = load_pickle_graph('path_1_no_3')
+        # print(path3)
+        # add_pickle_graph('path_1_no_3', path2, 'path_combined', replace_old=False)
+        # print('')
+        # print('Added F3 nodes to F1 nodes')
+        # pathcom = load_pickle_graph('path_combined')
+        # print(pathcom)
+
+        # # End test
 
         #plotVoronoiPath(grid, edges, path, start, goal, start_graph, goal_graph)
 

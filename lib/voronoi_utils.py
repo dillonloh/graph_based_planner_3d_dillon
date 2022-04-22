@@ -176,7 +176,7 @@ def a_star_graph(graph, start, goal, h):
 
     branch = {}
     found = False
-
+    
     while not queue.empty():
         item = queue.get()
         current_node = item[1]
@@ -213,8 +213,23 @@ def a_star_graph(graph, start, goal, h):
         print('**********************')
         print('Failed to find a path!')
         print('**********************')
-    return path[::-1], path_cost
 
+    correct_path = path[::-1]
+    
+
+    # CREATE NXGRAPH FROM PATH LIST
+    path_graph = nx.Graph()
+
+    for i in range(len(correct_path)-1):
+        node1 = correct_path[i]
+        node2 = correct_path[i+1]
+        edge = [node1, node2]
+        dist = heuristic(node1, node2)
+        path_graph.add_edge(node1, node2, weight=dist)
+                
+
+    return path[::-1], path_cost, path_graph # added return path_graph
+    
 
 def a_star_graph_WP(graph, start, number_list, h):
     '''
