@@ -11,6 +11,8 @@ import pickle
 from sklearn import linear_model
 from scipy.optimize import curve_fit, fmin
 import copy
+import cv2
+import yaml
 
 CALIBRATION_METHOD = 'MIN_SQUARES'
 
@@ -18,9 +20,20 @@ CALIBRATION_METHOD = 'MIN_SQUARES'
 print('Nice')
 
 with open('shared.pkl', 'rb') as fp:
-    shared = pickle.load(fp)
+    shared_files = pickle.load(fp)
 
+shared = shared_files[0]
+shared_yamls = shared_files[1]
 
+origins = []
+map_angles = [0, 0, 0] # no rotations specified in YAML files
+
+for y in shared_yamls:
+    stream = open(y)
+    f = yaml.safe_load(stream)
+    origins.append(f['origin'])
+
+# origins = [[2000, 2000], [2000, 2000], [2000, 2000]]
 NO_FLOORS = shared[-2]
 NO_OF_POINTS = shared[-1]
 
@@ -39,7 +52,6 @@ for i in range(NO_FLOORS):
     for j in range(NO_OF_POINTS):
         points.append(info[j])
     floor_points.append(points) # now floor points = [f1, f2, f3, ...]
-
 
 
 #### FUNCTIONS TO BE USED LATER ####
@@ -85,7 +97,7 @@ trans_matrices = []
 for f in translated_floor_points:
     translation_x = f[0][0]
     translation_y = f[0][1]
-    translation_amounts.append([translation_x, translation_y])
+    translation_amounts.append([translation_x, translation_y]) # only translate to match the first points
     for point in f:
         point[0] -= translation_x
         point[1] -= translation_y
@@ -99,6 +111,7 @@ for f in translated_floor_points:
     trans_matrices.append(np.array(([[-translation_x],
                                      [-translation_y],
                                      [0]])))
+print(translated_floor_points)
 
 # for i in range(len(trans_matrices)):
 #     print('Translation Matrix for Floor {}'.format(i+1))
@@ -245,6 +258,7 @@ elif CALIBRATION_METHOD == 'MIN_SQUARES':
     new_trans_floor_points = copy.deepcopy(floor_points)
     new_trans_amts = []
     new_trans_matrices = []
+    new_trans_matrices_meters = []
 
     for i, f in enumerate(new_trans_floor_points):
         # rotate the points first
@@ -252,20 +266,30 @@ elif CALIBRATION_METHOD == 'MIN_SQUARES':
         for j, point in enumerate(f):
             xr, yr = rotation(rot, point[0], point[1])
             new_trans_floor_points[i][j] = [xr, yr]
-
-    for f in new_trans_floor_points:
+    
+    for i, f in enumerate(new_trans_floor_points, 0):
         # use new rotated points to get translation amounts
-        new_trans_x = f[0][0]
-        new_trans_y = f[0][1]
+        map_x = origins[i][0]
+        map_y = origins[i][1]
+        theta = rotation_angles[i]
+        u = (map_x * cos(theta)) - (map_y * sin(theta)) # origin of map system in building coords (x) after rotation
+        v = (map_x * sin(theta)) + (map_y * cos(theta)) # origin of map system in building coords (y) after rotation
+
+        new_trans_x = f[0][0] - floor_points[0][0][0] - u
+        new_trans_y = f[0][1] - floor_points[0][0][1] - v
         
         new_trans_amts.append([-new_trans_x, -new_trans_y])
 
-        new_trans_matrices.append(np.array(([[new_trans_x],
-                                             [new_trans_y],
+        new_trans_matrices.append(np.array(([[-new_trans_x],
+                                             [-new_trans_y],
                                              [0]])))
+        new_trans_matrices_meters.append(np.array(([[-new_trans_x*0.05],
+                                                    [-new_trans_y*0.05],
+                                                    [0]])))
 
     transforms_dict = {}
     transforms_dict['translation'] = new_trans_matrices
+    transforms_dict['translation_meters'] = new_trans_matrices_meters
     transforms_dict['rotations'] = rot_matrices
 
     with open('transformations2.pickle', 'wb') as handle:
@@ -279,8 +303,11 @@ elif CALIBRATION_METHOD == 'MIN_SQUARES':
             lines.append('Angle of rot. about z-axis (Floor {}): {}'.format(i+1, rotation_angles[i]))
             lines.append('Translation Matrix of Floor {}'.format(i+1))
             lines.append(str(new_trans_matrices[i]))
+            lines.append('Translation Matrix (in meters) of Floor {}'.format(i+1))
+            lines.append(str(new_trans_matrices_meters[i]))
             lines.append('Rotation Matrix of Floor {}'.format(j+1))
             lines.append(str(rot_matrices[j]))
+            
 
                 
         f.write('\n'.join(lines))
@@ -288,20 +315,52 @@ elif CALIBRATION_METHOD == 'MIN_SQUARES':
     for i in range(len(new_trans_matrices)):
         print('Translation Matrix for Floor {}'.format(i+1))
         print(new_trans_matrices[i])
+        print('Translation Matrix (in meters) for Floor {}'.format(i+1))
+        print(new_trans_matrices_meters[i])
 
+    
     # plotting
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
+    
 
-    for i in range(NO_FLOORS): # set 2 for faster load
+    for i in range(0, NO_FLOORS): # set 2 for faster load
         x, y = np.mgrid[0:MAP_IMAGES[i].shape[0], 0:MAP_IMAGES[i].shape[1]]
         z = np.atleast_2d(i*10)
         
         xr, yr = rotation(rotation_angles[i], x, y)
         xtr, ytr = translation(new_trans_amts[i][0], new_trans_amts[i][1], xr, yr)
 
-        ax.plot_surface(xtr, ytr, z, facecolors=MAP_IMAGES[i], shade=False, rstride=20, cstride=20)
+        if len(MAP_IMAGES[i].shape) == 2: # check if it is grayscale image
+            cmap = cv2.cvtColor(MAP_IMAGES[i], cv2.COLOR_GRAY2RGB)/MAP_IMAGES[i].max()
+        else: # if rgb image
+            cmap = MAP_IMAGES[i]
+
+        ax.plot_surface(xtr, ytr, z, facecolors=cmap, shade=False, rstride=20, cstride=20, alpha=0.1)
+        
+        ax.view_init(azim=0, elev=90)
+
+    # i = 0
+
+    # x, y = np.mgrid[0:MAP_IMAGES[i].shape[0], 0:MAP_IMAGES[i].shape[1]]
+    # xr, yr = rotation(rotation_angles[i], x, y)
+    # xtr, ytr = translation(new_trans_amts[i][0], new_trans_amts[i][1], xr, yr)
+    
+    # plt.scatter(xtr, ytr, cmap=MAP_IMAGES[i])
+    
+    # rotgay = [0, 0.074]
+    # gay = [[0, 0], [1114, 4337]]
+    # for i in range(0, NO_FLOORS-1): # set 2 for faster load
+    #     x, y = np.mgrid[0:MAP_IMAGES[i].shape[0], 0:MAP_IMAGES[i].shape[1]]
+    #     z = np.atleast_2d(i*10)
+        
+    #     xr, yr = rotation(rotation_angles[i], x, y)
+    #     xtr, ytr = translation(gay[i][0], gay[i][1], xr, yr)
+
+
+    #     ax.plot_surface(xtr, ytr, z, facecolors=MAP_IMAGES[i], shade=False, rstride=20, cstride=20)
 
     plt.show()
+
 

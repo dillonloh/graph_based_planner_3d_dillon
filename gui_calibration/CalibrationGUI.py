@@ -12,13 +12,14 @@ SET_NO = 1
 GLOBAL_POINTS = [] # each entry is a floor's dict of points
 GLOBAL_IMAGES = []
 GLOBAL_IMAGE_PATHS = []
+GLOBAL_YAML = []
 CURRENT_IMG_INDEX = 0
 
 root = Tk()
 
 def create_window():
 
-    global GLOBAL_POINTS, GLOBAL_IMAGES, CURRENT_IMG_INDEX
+    global GLOBAL_POINTS, GLOBAL_IMAGES, CURRENT_IMG_INDEX, GLOBAL_YAML
     global img
 
 
@@ -38,7 +39,7 @@ def create_window():
     label_btn.grid(row=0, column=0, rowspan=2)
 
     def calibrate():
-        global GLOBAL_POINTS, GLOBAL_IMAGES, GLOBAL_IMAGE_PATHS, NO_FLOORS, NO_OF_POINTS
+        global GLOBAL_POINTS, GLOBAL_IMAGES, GLOBAL_IMAGE_PATHS, GLOBAL_YAML, NO_FLOORS, NO_OF_POINTS
         
         import pickle
 
@@ -48,7 +49,7 @@ def create_window():
         GLOBAL_POINTS.append(NO_FLOORS) # metainfo index -2
         GLOBAL_POINTS.append(NO_OF_POINTS) # metainfo index -1
 
-        shared = GLOBAL_POINTS
+        shared = [GLOBAL_POINTS, GLOBAL_YAML]
 
         with open('shared.pkl', 'wb') as fp:
             pickle.dump(shared, fp)
@@ -115,6 +116,10 @@ def create_window():
     canvas.create_image(0,0,image=GLOBAL_IMAGES[CURRENT_IMG_INDEX],anchor="nw") # always display floor 1 image first
     canvas.config(scrollregion=canvas.bbox(ALL))
 
+    # add YAML files
+    for i in range(NO_FLOORS):
+        File = askopenfilename(parent=window, initialdir="../images",title='Please upload the YAML file of Floor {}.'.format(i+1))
+        GLOBAL_YAML.append(File)
 
     #function to be called when mouse is clicked
     def printcoords(event):
